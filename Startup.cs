@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using AuthenticationService.Interfaces;
+using AuthenticationService.Logic;
 
 namespace AuthenticationService
 {
@@ -26,6 +28,7 @@ namespace AuthenticationService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSingleton<IAuthenticationRepository, AuthenticationRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -35,7 +38,7 @@ namespace AuthenticationService
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            //TODO: USE HTTPS think about this reverse proxy.
             app.UseHttpsRedirection();
 
             app.UseRouting();
