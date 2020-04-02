@@ -22,3 +22,9 @@ This region is used for the injection of the repository to certain interfaces
 
 ##### Services injection
 This region is used for the injection of the services to certain interfaces
+
+### CICD
+To be added, Jenkins file.
+To be added deployment.yaml
+To be added service.yaml
+To be added ingress.yaml
