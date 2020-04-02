@@ -1,0 +1,20 @@
+Transient wordt elke keer gemaakt als die gebruikt wordt. bij elk verzoek.
+scoped wordt elke keer per connection request gedaan.
+singleton een keer wordt aangemaakt daarna wordt die instance gebruikt.
+
+Singleton of scoped gebruik je als je een bepaalde state wilt behouden. transient wordt de gehele object als het ware gereset. opnieuwe geinitialiseerd.
+
+2 dingen
+Salt : randomly gen string
+Password : wachtwoord
+
+die 2 combineer met een hash methode.
+
+hier komt iets uit en dit is wat je opslaat. hier komt je salt in in plaintext dellitmeter outcome
+
+voorbeeld:
+Salt = aBSSSq4
+password = wachtwoord
+dellimeter = $
+
+uitkomst hash: aBSSSq4$akdsfhau3189hdasf912
