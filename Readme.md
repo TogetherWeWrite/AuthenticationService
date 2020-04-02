@@ -10,3 +10,15 @@ You will need to have a mysql service running you can do this easily with the he
 
 ##### reason 
 This is to indicate what certain variables mean in comparison the the docker-compose.yml file
+
+#### Startup.cs ConfigureServices settings
+This project uses Independecy injection with a repository pattern. This can be found in Startup.Configureservice(IServiceCollection).
+
+##### database injection
+the lines in the region database injection are used to make sure the database works with the settings that are in the appsettings.json
+
+##### repository injection
+This region is used for the injection of the repository to certain interfaces
+
+##### Services injection
+This region is used for the injection of the services to certain interfaces
