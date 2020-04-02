@@ -12,32 +12,31 @@ namespace AuthenticationService.Controllers
     [ApiController]
     public class RegisterController : ControllerBase
     {
-        private IAuthenticationRepository _registerRepostiry;
+        private IRegister _registerRepostiry;
 
-        public RegisterController(IAuthenticationRepository registerRepository)
+        public RegisterController(IRegister registerRepository)
         {
             this._registerRepostiry = registerRepository;
         }
 
         [HttpPost]
-        public bool Post(string username, string password)
+        public async Task<ActionResult<View.Account>> Post(View.Account account)
         {
             try
             {
-                _registerRepostiry.RegisterAccount(username, password);
+                if (_registerRepostiry.RegisterAccount(account.username, account.password))
+                {
+                    return Ok("Your account has succesfully been registered.");
+                }
+                else
+                {
+                    return BadRequest("Something went wrong, please try again at a later date.");
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                return BadRequest(ex.Message);
             }
-            return true;
-        }
-
-        [HttpGet]
-        public bool Get()
-        {
-            _registerRepostiry.RegisterAccount("", "");
-            return true;
         }
     }
 
@@ -45,18 +44,35 @@ namespace AuthenticationService.Controllers
     [ApiController]
     public class LoginController : ControllerBase
     {
+        private ILogin _loginRepository;
+        public LoginController(ILogin _loginRepository)
+        {
+            this._loginRepository = _loginRepository;
+        }
         [HttpPost]
-        public bool Post(string username, string password)
+        public async Task<ActionResult<View.Account>> Post(View.Account account)
         {
             try
             {
-                //logic
+                if(_loginRepository.Login(account.username, account.password))
+                {
+                    return Ok("You have succesfully logged in"); //TODO @Stijn: Make sure a session token will be added in the future.
+                }
+                else
+                {
+                    return BadRequest("Your username or password was not correct");
+                }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return false;
+                return BadRequest(ex.Message);
             }
-            return true;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<View.SessionToken>> Get(View.SessionToken sessionToken)
+        {
+            return Ok();
         }
     }
 }

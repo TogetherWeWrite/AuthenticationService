@@ -1,17 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using AuthenticationService.Interfaces;
 using AuthenticationService.Logic;
+using AuthenticationService.Data;
+using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using AuthenticationService.Services;
 
 namespace AuthenticationService
 {
@@ -28,7 +27,26 @@ namespace AuthenticationService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<IAuthenticationRepository, AuthenticationRepository>();
+
+            #region database injection 
+            services.AddDbContext<AuthenticationContext>(options =>
+                options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
+
+
+            services.AddTransient<AuthenticationContext, AuthenticationContext>();
+
+            #endregion
+
+            #region Repository injection
+            services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
+            services.AddTransient<IRegister, AuthenticationRepository>();
+            services.AddTransient<ILogin, AuthenticationRepository>();
+            #endregion
+
+            #region Services injection
+            services.AddTransient<IEncryptionService, EncryptionService>();
+            #endregion
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
