@@ -27,22 +27,18 @@ namespace AuthenticationService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
             #region database injection 
             services.AddDbContext<AuthenticationContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
 
 
             services.AddTransient<AuthenticationContext, AuthenticationContext>();
-
             #endregion
-
             #region Repository injection
             services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
             services.AddTransient<IRegister, AuthenticationRepository>();
             services.AddTransient<ILogin, AuthenticationRepository>();
             #endregion
-
             #region Services injection
             services.AddTransient<IEncryptionService, EncryptionService>();
             #endregion
