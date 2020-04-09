@@ -17,5 +17,14 @@ namespace AuthenticationService.Models
         public byte[] Password { get; set; }
         [Required]
         public byte[] Salt { get; set; }
+        public string Token { get; set; }
+    }
+    public static class ExtensionAccount
+    {
+        public static Account WithoutPassword(this Account account)
+        {
+            account.Password = null;
+            return account;
+        }
     }
 }

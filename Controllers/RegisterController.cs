@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AuthenticationService.Interfaces;
+using AuthenticationService.Models;
 
 namespace AuthenticationService.Controllers
 {
@@ -54,14 +55,7 @@ namespace AuthenticationService.Controllers
         {
             try
             {
-                if(_loginRepository.Login(account.username, account.password))
-                {
-                    return Ok("You have succesfully logged in"); //TODO @Stijn: Make sure a session token will be added in the future.
-                }
-                else
-                {
-                    return BadRequest("Your username or password was not correct");
-                }
+                return Ok(_loginRepository.Login(account.username, account.password));   
             }
             catch (Exception ex)
             {
@@ -69,10 +63,23 @@ namespace AuthenticationService.Controllers
             }
         }
 
+        /// <summary>
+        /// This method will be used by other services that need to validate a token.
+        /// </summary>
+        /// <param name="account">account model which needs to hold the username and the token</param>
+        /// <returns>boolean which states if the token is correct or not.</returns>
         [HttpGet]
-        public async Task<ActionResult<View.SessionToken>> Get(View.SessionToken sessionToken)
+        public async Task<ActionResult<bool>> Get(View.Account account)
         {
-            return Ok();
+            try
+            {
+                return Ok(_loginRepository.ValidateToken(account.username, account.token));
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
+
 }

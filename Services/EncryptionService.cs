@@ -22,7 +22,6 @@ namespace AuthenticationService.Services
 
             return argon2.GetBytes(16);
         }
-
         public byte[] GenerateSalt()
         {
             var buffer = new byte[16];

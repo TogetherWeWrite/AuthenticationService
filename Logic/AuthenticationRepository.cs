@@ -15,13 +15,16 @@ namespace AuthenticationService.Logic
     public class AuthenticationRepository : IAuthenticationRepository
     {
         private IEncryptionService _encryptionService;
+        private ITokenService _tokenservice;
         private AuthenticationContext _authenticationContext;
-        public AuthenticationRepository(AuthenticationContext _authenticationContext, IEncryptionService _encryptionService)
+        public AuthenticationRepository(AuthenticationContext _authenticationContext, IEncryptionService _encryptionService, ITokenService _tokenservice)
         {
             this._authenticationContext = _authenticationContext;
             this._encryptionService = _encryptionService;
+            this._tokenservice = _tokenservice;
         }
-        public bool Login(string username, string password)
+
+        public View.Account Login(string username, string password)
         {
             username.IsStringNotNullOrEmpty("Username");
             password.IsStringNotNullOrEmpty("Password");
@@ -30,20 +33,29 @@ namespace AuthenticationService.Logic
                 var account = _authenticationContext.Accounts.Single(x => x.Username == username);
                 if (_encryptionService.VerifyHash(password, account.Salt, account.Password))
                 {
-                    return true;
+                    //todo token service.
+                    var accountWithtoken = _tokenservice.Authenticate(account);
+                    _authenticationContext.SaveChanges(); //_tokenservice Authenticate will give token
+                    return new View.Account()
+                    {
+                        username = account.Username,
+                        token = account.Token
+                    };
                 }
                 else
                 {
-                    return false;
+                    throw new InvalidLoginException("password is incorrect");
                 }
             }
             catch (ArgumentNullException)
             {
-                throw new InvalidLoginException("It Appears that no account with this username is registered");
+                //more than one result
+                throw new InvalidLoginException("It appears due to spaghetti code that your username is also used by another user, the admin has been notified and you will get a message shortly with more information. Our applogies.");
             }
             catch (InvalidOperationException)
             {
-                throw new InvalidLoginException("It appears due to spaghetti code that your username is also used by another user, the admin has been notified and you will get a message shortly with more information. Our applogies.");
+                //no result
+                throw new InvalidLoginException("It Appears that no account with this username is registered");
             }
             
 
@@ -55,7 +67,8 @@ namespace AuthenticationService.Logic
             password.IsStringNotNullOrEmpty("Password");
             var salt = _encryptionService.GenerateSalt();
             var encryptedpassword = _encryptionService.EncryptWord(password, salt);
-            if(_authenticationContext.Accounts.Select(account => account.Username == username).Count() > 0)
+            var x = _authenticationContext.Accounts.Select(account => account.Username == username);
+            if (_authenticationContext.Accounts.SingleOrDefault(account => account.Username == username) != null)
             {
                 throw new UsernameAlreadyTakenException("There is already an account with this username");
             }
@@ -70,9 +83,23 @@ namespace AuthenticationService.Logic
             return true;
         }
 
-        public void ValidateSession(object sessionToken)
+        public bool ValidateToken(string username, string token)
         {
-            throw new NotImplementedException();
+            try
+            {
+                //TODO: Use tokenservice to check if token is still valid.
+                return token == _authenticationContext.Accounts.Single(x => x.Username == username).Token;//if token is same return true if not false
+            }
+            catch (InvalidOperationException)
+            {
+                //no result
+                throw new InvalidLoginException("It Appears that no account with this username is registered");
+            }
+            catch (ArgumentNullException)
+            {
+                //more than one result
+                throw new InvalidLoginException("It appears due to spaghetti code that your username is also used by another user, the admin has been notified and you will get a message shortly with more information. Our applogies.");
+            }
         }
     }
 }
