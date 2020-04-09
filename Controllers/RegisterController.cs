@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using AuthenticationService.Interfaces;
 using AuthenticationService.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AuthenticationService.Controllers
 {
@@ -81,5 +82,18 @@ namespace AuthenticationService.Controllers
             }
         }
     }
+
+    [Authorize]
+    [Route("[controller]")]
+    [ApiController]
+    public class authenticate : ControllerBase
+    {
+        [HttpGet]
+        public ActionResult Get()
+        {
+            return Ok("yeet");
+        }
+    }
+
 
 }

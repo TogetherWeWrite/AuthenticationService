@@ -14,8 +14,8 @@ namespace AuthenticationService.Logic
 {
     public class AuthenticationRepository : IAuthenticationRepository
     {
-        private IEncryptionService _encryptionService;
-        private ITokenService _tokenservice;
+        private readonly IEncryptionService _encryptionService;
+        private readonly ITokenService _tokenservice;
         private AuthenticationContext _authenticationContext;
         public AuthenticationRepository(AuthenticationContext _authenticationContext, IEncryptionService _encryptionService, ITokenService _tokenservice)
         {
@@ -67,7 +67,6 @@ namespace AuthenticationService.Logic
             password.IsStringNotNullOrEmpty("Password");
             var salt = _encryptionService.GenerateSalt();
             var encryptedpassword = _encryptionService.EncryptWord(password, salt);
-            var x = _authenticationContext.Accounts.Select(account => account.Username == username);
             if (_authenticationContext.Accounts.SingleOrDefault(account => account.Username == username) != null)
             {
                 throw new UsernameAlreadyTakenException("There is already an account with this username");
