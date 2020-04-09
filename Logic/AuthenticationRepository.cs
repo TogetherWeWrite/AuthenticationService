@@ -33,11 +33,11 @@ namespace AuthenticationService.Logic
                 var account = _authenticationContext.Accounts.Single(x => x.Username == username);
                 if (_encryptionService.VerifyHash(password, account.Salt, account.Password))
                 {
-                    //todo token service.
                     var accountWithtoken = _tokenservice.Authenticate(account);
-                    _authenticationContext.SaveChanges(); //_tokenservice Authenticate will give token
+                    _authenticationContext.SaveChanges();
                     return new View.Account()
                     {
+                        id = account.Id,
                         username = account.Username,
                         token = account.Token
                     };

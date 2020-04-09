@@ -9,15 +9,18 @@ using Microsoft.IdentityModel.Tokens;
 using AuthenticationService.Models;
 using AuthenticationService.Helpers;
 using AuthenticationService.Exceptions;
+using AuthenticationService.Data;
 
 namespace AuthenticationService.Services
 {
     public class TokenService : ITokenService
     {
         private readonly AppSettings _appSettings;
-        public TokenService(IOptions<AppSettings> appsettings)
+        private AuthenticationContext _context;
+        public TokenService(IOptions<AppSettings> appsettings, AuthenticationContext context)
         {
             this._appSettings = appsettings.Value;
+            _context = context;
         }
 
         public Account Authenticate(Account account)
@@ -33,15 +36,14 @@ namespace AuthenticationService.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, account.Username.ToString())
+                    new Claim(ClaimTypes.Name, account.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
             account.Token = tokenHandler.WriteToken(token);
-
-            return account.WithoutPassword();
+            return account;
         }
     }
 

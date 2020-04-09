@@ -10,8 +10,9 @@ namespace AuthenticationService.Models
     public class Account
     {
         [Key]
+        public int Id { get; set; }
         [Required]
-        [MaxLength(25),MinLength(2)]
+        [MaxLength(25), MinLength(2)]
         public string Username { get; set; }
         [Required]
         public byte[] Password { get; set; }
