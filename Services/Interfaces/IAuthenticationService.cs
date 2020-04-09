@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 using AuthenticationService.Exceptions;
 using AuthenticationService.View;
 
-namespace AuthenticationService.Interfaces
+namespace AuthenticationService.Services.Interfaces
 {
-    public interface IAuthenticationRepository: IRegister, ILogin
+    public interface IAuthenticationService: IRegister, ILogin
     {
+        
     }
 }

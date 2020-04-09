@@ -23,12 +23,12 @@ namespace AuthenticationService.Services
             _context = context;
         }
 
-        public Account Authenticate(Account account)
+        public Account Authenticate(Account user)
         {
-            if(account == null)
-            {
-                throw new InvalidLoginException("account is empty");
-            }
+            // return null if user not found
+            if (user == null)
+                return null;
+
             // authentication successful so generate jwt token
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
@@ -36,21 +36,21 @@ namespace AuthenticationService.Services
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, account.Id.ToString())
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
-            account.Token = tokenHandler.WriteToken(token);
-            return account;
+            user.Token = tokenHandler.WriteToken(token);
+            return user;
         }
     }
 
     public interface ITokenService
     {
         /// <summary>
-        /// Will Return an account without password that will hold the token which is valid 7 days.
+        /// Will Return an account that will hold the token which is valid 7 days.
         /// </summary>
         /// <param name="account">Account of which you know username and password is correct please use, <see cref="IEncryptionService"/></param>
         /// <returns><see cref="Account"/> without password with token</returns>

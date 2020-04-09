@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AuthenticationService.View
 {
-    public class Account
+    public class ViewUser
     {
         public int id { get; set; }
         public string username { get; set; }
@@ -16,10 +16,10 @@ namespace AuthenticationService.View
 
     public static class ExtensionAccount
     {
-        public static Account WithoutPassword(this Account account)
+        public static ViewUser WithoutPassword(this ViewUser user)
         {
-            account.password = null;
-            return account;
+            user.password = null;
+            return user;
         }
     }
 

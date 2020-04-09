@@ -5,7 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AuthenticationService.Interfaces;
-using AuthenticationService.Logic;
 using AuthenticationService.Data;
 using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +14,7 @@ using AuthenticationService.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using AuthenticationService.Services.Interfaces;
 
 namespace AuthenticationService
 {
@@ -36,6 +36,7 @@ namespace AuthenticationService
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
+            // configure jwt authentication
             var appSettings = appSettingsSection.Get<AppSettings>();
             var key = Encoding.ASCII.GetBytes(appSettings.Secret);
             services.AddAuthentication(x =>
@@ -47,13 +48,12 @@ namespace AuthenticationService
             {
                 x.RequireHttpsMetadata = false;
                 x.SaveToken = true;
-                x.IncludeErrorDetails = true;
                 x.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false,
+                    ValidateAudience = false
                 };
             });
             #endregion
@@ -65,13 +65,15 @@ namespace AuthenticationService
             services.AddTransient<AuthenticationContext, AuthenticationContext>();
             #endregion
             #region Repository injection
-            services.AddTransient<IAuthenticationRepository, AuthenticationRepository>();
-            services.AddTransient<IRegister, AuthenticationRepository>();
-            services.AddTransient<ILogin, AuthenticationRepository>();
+            services.AddTransient<IAccountRepository, AccountRepository>();
             #endregion
             #region Services injection
             services.AddTransient<IEncryptionService, EncryptionService>();
             services.AddTransient<ITokenService, TokenService>();
+            services.AddTransient<IAuthenticationService, AuthenticationServices>();
+            services.AddTransient<IRegister, AuthenticationServices>();
+            services.AddTransient<ILogin, AuthenticationServices>();
+            services.AddTransient<IAuthenticationService, AuthenticationServices>();
             #endregion
             services.AddControllers();
 
@@ -88,9 +90,9 @@ namespace AuthenticationService
             app.UseHttpsRedirection();
 
             app.UseCors(x => x
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials());
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader());
 
             app.UseRouting();
 

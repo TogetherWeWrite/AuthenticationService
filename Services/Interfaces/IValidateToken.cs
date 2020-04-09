@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AuthenticationService.Interfaces
+namespace AuthenticationService.Services.Interfaces
 {
 
     public interface IValidateToken

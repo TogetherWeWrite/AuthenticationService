@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using AuthenticationService.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AuthenticationService.Services.Interfaces;
+
 
 namespace AuthenticationService.Controllers
 {
@@ -19,11 +21,11 @@ namespace AuthenticationService.Controllers
             this._loginRepository = _loginRepository;
         }
         [HttpPost]
-        public async Task<ActionResult<View.Account>> Post(View.Account account)
+        public async Task<ActionResult<View.ViewUser>> Post(View.ViewUser user)
         {
             try
             {
-                return Ok(_loginRepository.Login(account.username, account.password));
+                return Ok(_loginRepository.Login(user.username, user.password));
             }
             catch (Exception ex)
             {
@@ -34,14 +36,14 @@ namespace AuthenticationService.Controllers
         /// <summary>
         /// This method will be used by other services that need to validate a token.
         /// </summary>
-        /// <param name="account">account model which needs to hold the username and the token</param>
+        /// <param name="user">account model which needs to hold the username and the token</param>
         /// <returns>boolean which states if the token is correct or not.</returns>
         [HttpGet]
-        public async Task<ActionResult<bool>> Get(View.Account account)
+        public async Task<ActionResult<bool>> Get(View.ViewUser user)
         {
             try
             {
-                return Ok(_loginRepository.ValidateToken(account.username, account.token));
+                return Ok(_loginRepository.ValidateToken(user.username, user.token));
             }
             catch (Exception ex)
             {

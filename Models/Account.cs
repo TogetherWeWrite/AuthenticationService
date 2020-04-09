@@ -27,5 +27,14 @@ namespace AuthenticationService.Models
             account.Password = null;
             return account;
         }
+
+        public static Account TakeOverVariables(this Account account, Account toTakeOver)
+        {
+            account.Username = toTakeOver.Username;
+            account.Password = toTakeOver.Password;
+            account.Salt = toTakeOver.Salt;
+            account.Token = toTakeOver.Token;
+            return account;
+        }
     }
 }
