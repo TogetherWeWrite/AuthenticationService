@@ -75,6 +75,7 @@ namespace AuthenticationService
             services.AddTransient<IRegister, AuthenticationServices>();
             services.AddTransient<ILogin, AuthenticationServices>();
             services.AddTransient<IAuthenticationService, AuthenticationServices>();
+            services.AddTransient<IAccountservice, AccountService>();
             #endregion
             services.AddControllers();
 
