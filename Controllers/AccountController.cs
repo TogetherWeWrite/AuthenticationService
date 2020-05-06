@@ -24,11 +24,25 @@ namespace AuthenticationService.Controllers
         {
             try
             {
-                return Ok(_accountservice.GetAccount(id).Result);
+                return Ok(await _accountservice.GetAccount(id));
             }
             catch (Exception ex)
             {
                 return BadRequest("Getting Account with Id: "+id+" was not succesful, Exception: " +ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("id")]
+        public async Task<ActionResult<int>> GetIdFromUserName(string username)
+        {
+            try
+            {
+                return Ok(await _accountservice.GetId(username));
+            }
+            catch(Exception ex)
+            {
+                return BadRequest(ex);
             }
         }
     }
