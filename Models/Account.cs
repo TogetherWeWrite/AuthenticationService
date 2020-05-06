@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using AuthenticationService.View;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace AuthenticationService.Models
@@ -35,6 +36,15 @@ namespace AuthenticationService.Models
             account.Salt = toTakeOver.Salt;
             account.Token = toTakeOver.Token;
             return account;
+        }
+
+        public static ViewAccount toViewAccount(this Account account)
+        {
+            return new ViewAccount()
+            {
+                Id = account.Id,
+                Name = account.Username
+            };
         }
     }
 }
