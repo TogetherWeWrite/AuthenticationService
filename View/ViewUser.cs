@@ -8,17 +8,17 @@ namespace AuthenticationService.View
 {
     public class ViewUser
     {
-        public int id { get; set; }
-        public string username { get; set; }
-        public string password { get; set; }
-        public string token { get; set; }
+        public int Id { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Token { get; set; }
     }
 
     public static class ExtensionAccount
     {
         public static ViewUser WithoutPassword(this ViewUser user)
         {
-            user.password = null;
+            user.Password = null;
             return user;
         }
     }

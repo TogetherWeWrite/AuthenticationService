@@ -27,7 +27,7 @@ namespace AuthenticationService.Controllers
         {
             try
             {
-                if (_registerRepostiry.RegisterAccount(user.username, user.password))
+                if (_registerRepostiry.RegisterAccount(user.Username, user.Password))
                 {
                     return Ok("Your account has succesfully been registered.");
                 }

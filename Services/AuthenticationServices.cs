@@ -28,15 +28,19 @@ namespace AuthenticationService.Services
             try
             {
                 var account = _accountRepository.Get(username);
+                if(account == null)
+                {
+                    throw new InvalidLoginException("No account with the username: " + username);
+                }
                 if (_encryptionService.VerifyHash(password, account.Salt, account.Password))
                 {
                     var accountWithtoken = _tokenservice.Authenticate(account);
                     _accountRepository.Update(account.Id, accountWithtoken);
                     return new View.ViewUser()
                     {
-                        id = account.Id,
-                        username = account.Username,
-                        token = account.Token
+                        Id = account.Id,
+                        Username = account.Username,
+                        Token = account.Token
                     };
                 }
                 else

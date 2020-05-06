@@ -19,7 +19,7 @@ namespace AuthenticationService.Services
         {
             if (param.IsNullOrEmpty())
             {
-                throw new FormatException(paramname + "is empty or null it is required to fill thiss");
+                throw new FormatException(paramname + " is empty or null it is required to fill this");
             }
             return true;
         }
