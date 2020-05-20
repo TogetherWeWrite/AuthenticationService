@@ -15,7 +15,7 @@ namespace AuthenticationService.Services.Interfaces
         /// <param name="token">The token you want to validate</param>
         /// <returns>bool which indicates if token is correctly or not.</returns>
         /// <exception cref="InvalidLoginException"></exception>
-        bool ValidateToken(string username, string token);
+        Task<bool> ValidateToken(string username, string token);
     }
 
 }

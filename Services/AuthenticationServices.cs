@@ -21,13 +21,13 @@ namespace AuthenticationService.Services
             this._tokenservice = _tokenservice;
             this._accountRepository = _accountRepository;
         }
-        public ViewUser Login(string username, string password)
+        public async Task<ViewUser> Login(string username, string password)
         {
             username.IsStringNotNullOrEmpty("Username");
             password.IsStringNotNullOrEmpty("Password");
             try
             {
-                var account = _accountRepository.Get(username);
+                var account = await _accountRepository.Get(username);
                 if(account == null)
                 {
                     throw new InvalidLoginException("No account with the username: " + username);
@@ -35,7 +35,7 @@ namespace AuthenticationService.Services
                 if (_encryptionService.VerifyHash(password, account.Salt, account.Password))
                 {
                     var accountWithtoken = _tokenservice.Authenticate(account);
-                    _accountRepository.Update(account.Id, accountWithtoken);
+                    await _accountRepository.Update(account.Id, accountWithtoken);
                     return new View.ViewUser()
                     {
                         Id = account.Id,
@@ -54,17 +54,17 @@ namespace AuthenticationService.Services
             }
         }
 
-        public bool RegisterAccount(string username, string password)
+        public async Task<bool> RegisterAccount(string username, string password)
         {
             username.IsStringNotNullOrEmpty("Username");
             password.IsStringNotNullOrEmpty("Password");
             var salt = _encryptionService.GenerateSalt();
             var encryptedpassword = _encryptionService.EncryptWord(password, salt);
-            if(_accountRepository.Get(username) !=null)
+            if(await _accountRepository.Get(username) !=null)
             {             
                 throw new UsernameAlreadyTakenException("There is already an account with this username");
             }
-            _accountRepository.Create(new Account()
+            await _accountRepository.Create(new Account()
             {
                 Username = username,
                 Password = encryptedpassword,
@@ -74,12 +74,13 @@ namespace AuthenticationService.Services
             return true;
         }
 
-        public bool ValidateToken(string username, string token)
+        public async Task<bool> ValidateToken(string username, string token)
         {
             try
             {
                 //TODO: Use tokenservice to check if token is still valid.
-                return token ==  _accountRepository.Get(username).Token;//if token is same return true if not false
+                var acc = await _accountRepository.Get(username);
+                return token == acc.Token ;//if token is same return true if not false
             }
             catch (NullReferenceException)
             {

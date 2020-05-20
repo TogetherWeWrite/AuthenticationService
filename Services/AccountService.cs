@@ -17,9 +17,9 @@ namespace AuthenticationService.Services
         {
             this._accountRepository = accountRepository;
         }
-        public async Task<ViewAccount> GetAccount(int id)
+        public async Task<ViewAccount> GetAccount(Guid id)
         {
-            var account = _accountRepository.Get(id);
+            var account = await _accountRepository.Get(id);
             if (account == null)
             {
                 throw new AccountNotFoundException("The account with the id: " + id + ", does not exist");

@@ -16,7 +16,6 @@ using Microsoft.IdentityModel.Tokens;
 using AuthenticationService.Models;
 using AuthenticationService.Helpers;
 using AuthenticationService.Exceptions;
-using AuthenticationService.Data;
 using AuthenticationService.Services;
 
 namespace AuthenticationService.Controllers

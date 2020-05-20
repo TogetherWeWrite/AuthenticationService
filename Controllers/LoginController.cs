@@ -25,7 +25,7 @@ namespace AuthenticationService.Controllers
         {
             try
             {
-                return Ok(_loginRepository.Login(user.Username, user.Password));
+                return Ok(await _loginRepository.Login(user.Username, user.Password));
             }
             catch (Exception ex)
             {
@@ -43,7 +43,7 @@ namespace AuthenticationService.Controllers
         {
             try
             {
-                return Ok(_loginRepository.ValidateToken(user.Username, user.Token));
+                return Ok(await _loginRepository.ValidateToken(user.Username, user.Token));
             }
             catch (Exception ex)
             {

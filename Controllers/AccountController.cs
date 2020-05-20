@@ -20,7 +20,7 @@ namespace AuthenticationService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ViewAccount>> Get(int id)
+        public async Task<ActionResult<ViewAccount>> Get(Guid id)
         {
             try
             {

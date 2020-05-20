@@ -15,6 +15,6 @@ namespace AuthenticationService.Services.Interfaces
         /// <exception cref="FormatException"> When the formatting of the username or password are not correct this exception will be thrown</exception>
         /// <exception cref="UsernameAlreadyTakenException"> When the formatting of the username or password are not correct this exception will be thrown</exception>
         /// <returns>boolean that will indicate if the Register has been succesfully been done</returns>
-        bool RegisterAccount(string username, string password);
+        Task<bool> RegisterAccount(string username, string password);
     }
 }
