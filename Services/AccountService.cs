@@ -27,9 +27,9 @@ namespace AuthenticationService.Services
             return account.toViewAccount();
         }
 
-        public async Task<int> GetId(string username)
+        public async Task<Guid> GetId(string username)
         {
-            var account = _accountRepository.Get(username);
+            var account = await _accountRepository.Get(username);
             if(account == null)
             {
                 throw new AccountNotFoundException("The account with the username: " + username +", does not exist");

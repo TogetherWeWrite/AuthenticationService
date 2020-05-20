@@ -9,6 +9,6 @@ namespace AuthenticationService.Services.Interfaces
     public interface IAccountservice
     {
         Task<ViewAccount> GetAccount(Guid id);
-        Task<int> GetId(string username);
+        Task<Guid> GetId(string username);
     }
 }

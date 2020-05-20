@@ -38,7 +38,7 @@ namespace AuthenticationService.Services
                     await _accountRepository.Update(account.Id, accountWithtoken);
                     return new View.ViewUser()
                     {
-                        Id = account.Id,
+                        Id = Convert.ToString(account.Id),
                         Username = account.Username,
                         Token = account.Token
                     };

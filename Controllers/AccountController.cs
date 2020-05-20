@@ -34,7 +34,7 @@ namespace AuthenticationService.Controllers
 
         [HttpGet]
         [Route("id")]
-        public async Task<ActionResult<int>> GetIdFromUserName(string username)
+        public async Task<ActionResult<Guid>> GetIdFromUserName(string username)
         {
             try
             {
