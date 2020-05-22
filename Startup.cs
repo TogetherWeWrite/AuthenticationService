@@ -12,6 +12,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using AuthenticationService.Services.Interfaces;
+using AuthenticationService.Setttings;
+using MessageBroker;
+using AuthenticationService.Publishers;
 
 namespace AuthenticationService
 {
@@ -65,6 +68,14 @@ namespace AuthenticationService
             #endregion
             #region Repository injection
             services.AddTransient<IAccountRepository, AccountRepositoryMongo>();
+            #endregion
+            #region Mq Settings
+            services.Configure<MessageQueueSettings>(Configuration.GetSection("MessageQueueSettings"));
+
+            services.AddMessagePublisher(Configuration["MessageQueueSettings:Uri"]);
+            #endregion
+            #region Publisher injection
+            services.AddTransient<IUserPublisher, UserPublisher>();
             #endregion
             #region Services injection
             services.AddTransient<IEncryptionService, EncryptionService>();
