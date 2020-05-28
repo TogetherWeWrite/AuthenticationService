@@ -1,0 +1,11 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: wereld-service
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: wereld-service

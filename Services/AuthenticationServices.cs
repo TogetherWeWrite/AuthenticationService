@@ -19,7 +19,6 @@ namespace AuthenticationService.Services
         private readonly IEncryptionService _encryptionService;
         private readonly ITokenService _tokenservice;
         private readonly IAccountRepository _accountRepository;
-        private readonly IMessageQueuePublisher _messageQueuePublisher;
         private readonly MessageQueueSettings _messageQueueSettings;
         private readonly IUserPublisher _userPublisher;
         public AuthenticationServices(IEncryptionService _encryptionService, ITokenService _tokenservice, IAccountRepository _accountRepository

@@ -1,6 +1,7 @@
-name: .NET Core
-
-on: [push]
+name: develop push
+on:
+  push:
+    branches: [develop]
 
 jobs:
   build:
