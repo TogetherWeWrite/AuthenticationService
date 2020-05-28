@@ -5,16 +5,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using AuthenticationService.Interfaces;
-using AuthenticationService.Data;
 using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using AuthenticationService.Services;
 using AuthenticationService.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using AuthenticationService.Services.Interfaces;
+using AuthenticationService.Setttings;
+using MessageBroker;
+using AuthenticationService.Publishers;
 
 namespace AuthenticationService
 {
@@ -59,14 +59,23 @@ namespace AuthenticationService
             });
             #endregion
             #region database injection 
-            services.AddDbContext<AuthenticationContext>(options =>
-                options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.Configure<AccountDatabaseSettings>(
+               Configuration.GetSection("AuthenticatieStoreSettings"));
 
-            services.AddTransient<AuthenticationContext, AuthenticationContext>();
+            services.AddSingleton<IAccountDatabaseSettings>(sp =>
+                sp.GetRequiredService<IOptions<AccountDatabaseSettings>>().Value);
             #endregion
             #region Repository injection
-            services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddTransient<IAccountRepository, AccountRepositoryMongo>();
+            #endregion
+            #region Mq Settings
+            services.Configure<MessageQueueSettings>(Configuration.GetSection("MessageQueueSettings"));
+
+            services.AddMessagePublisher(Configuration["MessageQueueSettings:Uri"]);
+            #endregion
+            #region Publisher injection
+            services.AddTransient<IUserPublisher, UserPublisher>();
             #endregion
             #region Services injection
             services.AddTransient<IEncryptionService, EncryptionService>();

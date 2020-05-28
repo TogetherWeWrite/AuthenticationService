@@ -9,18 +9,15 @@ using Microsoft.IdentityModel.Tokens;
 using AuthenticationService.Models;
 using AuthenticationService.Helpers;
 using AuthenticationService.Exceptions;
-using AuthenticationService.Data;
 
 namespace AuthenticationService.Services
 {
     public class TokenService : ITokenService
     {
         private readonly AppSettings _appSettings;
-        private AuthenticationContext _context;
-        public TokenService(IOptions<AppSettings> appsettings, AuthenticationContext context)
+        public TokenService(IOptions<AppSettings> appsettings)
         {
             this._appSettings = appsettings.Value;
-            _context = context;
         }
 
         public Account Authenticate(Account user)

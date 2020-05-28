@@ -16,7 +16,7 @@ namespace AuthenticationService.Services.Interfaces
         /// <returns><see cref="ViewUser"/> Which contains a token and **not** the password</returns>
         /// <exception cref="InvalidLoginException">When there is no account with this username</exception>
         /// <exception cref="InvalidLoginException">When there is are multiple accounts with this username which shouldnt be possible</exception>
-        ViewUser Login(string username, string password);
+        Task<ViewUser> Login(string username, string password);
     }
 
 }

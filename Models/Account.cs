@@ -4,14 +4,14 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using AuthenticationService.View;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace AuthenticationService.Models
 {
     public class Account
     {
-        [Key]
-        public int Id { get; set; }
+        [BsonId]
+        public Guid Id { get; set; }
         [Required]
         [MaxLength(25), MinLength(2)]
         public string Username { get; set; }

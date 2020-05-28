@@ -1,8 +1,12 @@
 ﻿using AuthenticationService.Exceptions;
 using AuthenticationService.Interfaces;
 using AuthenticationService.Models;
+using AuthenticationService.Publishers;
+using AuthenticationService.Setttings;
 using AuthenticationService.View;
+using MessageBroker;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,30 +19,35 @@ namespace AuthenticationService.Services
         private readonly IEncryptionService _encryptionService;
         private readonly ITokenService _tokenservice;
         private readonly IAccountRepository _accountRepository;
-        public AuthenticationServices(IEncryptionService _encryptionService, ITokenService _tokenservice, IAccountRepository _accountRepository)
+        private readonly MessageQueueSettings _messageQueueSettings;
+        private readonly IUserPublisher _userPublisher;
+        public AuthenticationServices(IEncryptionService _encryptionService, ITokenService _tokenservice, IAccountRepository _accountRepository
+            , IUserPublisher publisher)
         {
             this._encryptionService = _encryptionService;
             this._tokenservice = _tokenservice;
             this._accountRepository = _accountRepository;
+            this._userPublisher = publisher;
         }
-        public ViewUser Login(string username, string password)
+
+        public async Task<ViewUser> Login(string username, string password)
         {
             username.IsStringNotNullOrEmpty("Username");
             password.IsStringNotNullOrEmpty("Password");
             try
             {
-                var account = _accountRepository.Get(username);
-                if(account == null)
+                var account = await _accountRepository.Get(username);
+                if (account == null)
                 {
                     throw new InvalidLoginException("No account with the username: " + username);
                 }
                 if (_encryptionService.VerifyHash(password, account.Salt, account.Password))
                 {
                     var accountWithtoken = _tokenservice.Authenticate(account);
-                    _accountRepository.Update(account.Id, accountWithtoken);
+                    await _accountRepository.Update(account.Id, accountWithtoken);
                     return new View.ViewUser()
                     {
-                        Id = account.Id,
+                        Id = Convert.ToString(account.Id),
                         Username = account.Username,
                         Token = account.Token
                     };
@@ -48,38 +57,40 @@ namespace AuthenticationService.Services
                     throw new InvalidLoginException("password is incorrect");
                 }
             }
-            catch(NullReferenceException ex)
+            catch (NullReferenceException ex)
             {
                 throw new InvalidLoginException("no user found");
             }
         }
 
-        public bool RegisterAccount(string username, string password)
+        public async Task<bool> RegisterAccount(string username, string password)
         {
             username.IsStringNotNullOrEmpty("Username");
             password.IsStringNotNullOrEmpty("Password");
             var salt = _encryptionService.GenerateSalt();
             var encryptedpassword = _encryptionService.EncryptWord(password, salt);
-            if(_accountRepository.Get(username) !=null)
-            {             
+            if (await _accountRepository.Get(username) != null)
+            {
                 throw new UsernameAlreadyTakenException("There is already an account with this username");
             }
-            _accountRepository.Create(new Account()
+            var newaccount = await _accountRepository.Create(new Account()
             {
                 Username = username,
                 Password = encryptedpassword,
                 Salt = salt
 
             });
+            await _userPublisher.PublishRegisterUser(newaccount.Id, newaccount.Username);
             return true;
         }
 
-        public bool ValidateToken(string username, string token)
+        public async Task<bool> ValidateToken(string username, string token)
         {
             try
             {
                 //TODO: Use tokenservice to check if token is still valid.
-                return token ==  _accountRepository.Get(username).Token;//if token is same return true if not false
+                var acc = await _accountRepository.Get(username);
+                return token == acc.Token;//if token is same return true if not false
             }
             catch (NullReferenceException)
             {

@@ -1,4 +1,5 @@
-﻿using AuthenticationService.Interfaces;
+﻿using AuthenticationService.Exceptions;
+using AuthenticationService.Interfaces;
 using AuthenticationService.Models;
 using AuthenticationService.Services.Interfaces;
 using AuthenticationService.View;
@@ -16,10 +17,24 @@ namespace AuthenticationService.Services
         {
             this._accountRepository = accountRepository;
         }
-        public async Task<ViewAccount> GetAccount(int id)
+        public async Task<ViewAccount> GetAccount(Guid id)
         {
-            var account = _accountRepository.Get(id);
+            var account = await _accountRepository.Get(id);
+            if (account == null)
+            {
+                throw new AccountNotFoundException("The account with the id: " + id + ", does not exist");
+            }
             return account.toViewAccount();
+        }
+
+        public async Task<Guid> GetId(string username)
+        {
+            var account = await _accountRepository.Get(username);
+            if(account == null)
+            {
+                throw new AccountNotFoundException("The account with the username: " + username +", does not exist");
+            }
+            return account.Id;
         }
     }
 }
