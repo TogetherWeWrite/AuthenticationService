@@ -51,8 +51,16 @@ jobs:
     needs: build
     runs-on: ubuntu-18.04
     steps:
-      - name: Git checkout
-        uses: actions/checkout@v2
+      - name: Download release artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: release-artifact
+          path: .
+      - name: Download Dockerfile artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: dockerfile-artifact
+          path: .
       - name: Docker login
         run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
       - name: Build Docker image
