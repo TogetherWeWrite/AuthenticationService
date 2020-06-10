@@ -5,42 +5,39 @@ on:
 
 jobs:
   build:
-
+    name: build and test on ubuntu-18.04
     runs-on: ubuntu-18.04
-
+    container:
+      image: mcr.microsoft.com/dotnet/core/sdk:3.1.201-bionic
     steps:
       - uses: actions/checkout@v2
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 3.1.101
-      - name: Decrypt the GPG encrypted config files
-        run: gpg --quiet --batch --yes --passphrase="${{ secrets.GPG_SECRET }}" --output ./appsettings.json --decrypt ./appsettings.json.gpg
-
       - name: Install dependencies
         run: dotnet restore
 
+      - name: Decrypt the GPG encrypted config files
+        run: gpg --quiet --batch --yes --passphrase="${{ secrets.GPG_SECRET }}" --output ./WereldService/appsettings.json --decrypt ./WereldService/appsettings.json.gpg
+
       - name: Build
-        run: dotnet build --configuration Release --no-restore
-
+        run: dotnet build
+      
       - name: Test
-        run: dotnet test --no-restore --verbosity normal
-
+        run: dotnet test
+      
       - name: Publish
         run: dotnet publish -c Release -o out
-
+      
       - name: Upload release artifact
         uses: actions/upload-artifact@v1
         with:
           name: release-artifact
           path: ./out
-
+      
       - name: Upload Dockerfile artifact
         uses: actions/upload-artifact@v1
         with:
           name: dockerfile-artifact
           path: ./Dockerfile
-
+      
       - name: Upload Kubernetes artifact
         uses: actions/upload-artifact@v1
         with:
@@ -61,19 +58,15 @@ jobs:
         with:
           name: dockerfile-artifact
           path: .
-      - name: Docker login
-        run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.REPOSITORY_NAME }} .
-      - name: Tag Docker image
+      - name: Deliver Docker image
+        env:
+          CONTAINER_IMAGE: ${{ secrets.DOCKER_USER }}/${{ secrets.REPOSITORY_NAME }}:${{ github.sha }}
+          CONTAINER_IMAGE_LATEST: ${{ secrets.DOCKER_USER }}/${{ secrets.REPOSITORY_NAME }}:master
         run: |
-          docker tag ${{ secrets.REPOSITORY_NAME }} bstijnb/${{ secrets.REPOSITORY_NAME }}:${{ github.sha }}
-          docker tag ${{ secrets.REPOSITORY_NAME }} bstijnb/${{ secrets.REPOSITORY_NAME }}:latest
-      - name: Push Docker image
-        run: |
-          docker push bstijnb/${{ secrets.REPOSITORY_NAME }}:${{ github.sha }}
-          docker push bstijnb/${{ secrets.REPOSITORY_NAME }}:latest
-
+          docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          docker build -t $CONTAINER_IMAGE -t $CONTAINER_IMAGE_LATEST .
+          docker push $CONTAINER_IMAGE
+          docker push $CONTAINER_IMAGE_LATEST
   deploy:
     needs: delivery
     runs-on: ubuntu-18.04
