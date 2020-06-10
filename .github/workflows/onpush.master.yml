@@ -15,7 +15,7 @@ jobs:
         run: dotnet restore
 
       - name: Decrypt the GPG encrypted config files
-        run: gpg --quiet --batch --yes --passphrase="${{ secrets.GPG_SECRET }}" --output ./WereldService/appsettings.json --decrypt ./WereldService/appsettings.json.gpg
+        run: gpg --quiet --batch --yes --passphrase="${{ secrets.GPG_SECRET }}" --output ./appsettings.json --decrypt ./appsettings.json.gpg
 
       - name: Build
         run: dotnet build
